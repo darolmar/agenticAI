@@ -114,9 +114,9 @@ platon = ConversableAgent(
     is_termination_msg=lambda msg: "I gotta go" in msg["content"] or "Goodbye" in msg["content"],
 )
 
-chat_result = joe.initiate_chat(
+chat_result = platon.initiate_chat(
     recipient=kant,
     message="I'm Platon. Kant, let's explore whow the world look like if an AI govern a country."
 )
 
-kant.send(message="What's last joke we talked about?", recipient=platon)
+kant.send(message="What's last question we talked about?", recipient=platon)
