@@ -1,0 +1,109 @@
+## Setup
+
+llm_config={"model": "gpt-3.5-turbo"}
+
+from autogen import ConversableAgent
+
+## Creating the needed agents
+
+personal_information_agent = ConversableAgent(
+    name="Personal Information Agent",
+    system_message='''You are a helpful candidate onboarding agent,
+    you are here to help potential candidates get started with her job seeking process.
+    Your job is to gather candidate's name.
+    Do not ask for other information. Return 'TERMINATE' 
+    when you have gathered all the information.''',
+    llm_config=llm_config,
+    code_execution_config=False,
+    human_input_mode="NEVER",
+)
+
+preferences_information_agent = ConversableAgent(
+    name="Preferences Information Agent",
+    system_message='''You are a helpful candidate onboarding agent,
+    you are here to help potential candidates get started with her job seeking process.
+    Your job is to gather candidate's job preferences on a new role.
+    Do not ask for other information.
+    Return 'TERMINATE' when you have gathered all the information.''',
+    llm_config=llm_config,
+    code_execution_config=False,
+    human_input_mode="NEVER",
+)
+
+candidate_engagement_agent = ConversableAgent(
+    name="Candidate Engagement Agent",
+    system_message='''You are a helpful candidate service agent
+    here to provide advice for the candidate based on the user's
+    personal information and job preferences.
+    Return 'TERMINATE' when you are done.''',
+    llm_config=llm_config,
+    code_execution_config=False,
+    human_input_mode="NEVER",
+    is_termination_msg=lambda msg: "terminate" in msg.get("content").lower(),
+)
+
+candidate_proxy_agent = ConversableAgent(
+    name="candidate_proxy_agent",
+    llm_config=False,
+    code_execution_config=False,
+    human_input_mode="ALWAYS",
+    is_termination_msg=lambda msg: "terminate" in msg.get("content").lower(),
+)
+
+## Creating tasks
+
+Now, you can craft a series of tasks to facilitate the job seeking process.
+
+chats = [
+    {
+        "sender": personal_information_agent,
+        "recipient": candidate_proxy_agent,
+        "message": 
+            "Hello, I'm here to help you get started with your job seeking process."
+            "Could you tell me your name?",
+        "summary_method": "reflection_with_llm",
+        "summary_args": {
+            "summary_prompt" : "Return the customer information "
+                             "into as JSON object only: "
+                             "{'name': '''}",
+        },
+        "max_turns": 2,
+        "clear_history" : True
+    },
+    {
+        "sender": preferences_information_agent,
+        "recipient": candidate_proxy_agent,
+        "message": 
+                "Great! Could you tell me what type of skills you have?",
+        "summary_method": "reflection_with_llm",
+        "max_turns": 1,
+        "clear_history" : False
+    },
+    {
+        "sender": candidate_proxy_agent,
+        "recipient": candidate_engagement_agent,
+        "message": "Let's find something fun to read.",
+        "max_turns": 1,
+        "summary_method": "reflection_with_llm",
+    },
+]
+
+## Start the onboarding process
+
+**Note**: Feel free to try different inputs, such as name, and preferences.
+
+from autogen import initiate_chats
+
+chat_results = initiate_chats(chats)
+
+## Print out the summary
+
+for chat_result in chat_results:
+    print(chat_result.summary)
+    print("\n")
+
+## Print out the cost
+
+for chat_result in chat_results:
+    print(chat_result.cost)
+    print("\n")
