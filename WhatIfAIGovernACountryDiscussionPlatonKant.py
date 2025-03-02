@@ -1,10 +1,4 @@
-# Lesson 1: Multi-Agent Conversation and Stand-up Comedy
-
-Welcome to Lesson 1.
-
-To access the `requirements.txt` file and the`utils` modules, please go to the `File` menu and select`Open...`.
-
-I hope you enjoy this course!
+# Multi-Agent Conversation: Platon and Kant discussing how the world would look like if an AI govern a country
 
 ## Setup
 
@@ -54,7 +48,6 @@ kant = ConversableAgent(
     human_input_mode="NEVER",
 )
 
-**Note**: You might get a slightly different response (set of question and answer pairs) than what is shown in the video
 
 chat_result = platon.initiate_chat(
     recipient=kant, 
